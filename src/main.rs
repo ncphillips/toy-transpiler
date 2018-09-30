@@ -22,7 +22,9 @@ fn main() {
 
     let ast = parser::parse(&mut tokens);
 
-    println!("{}", ast);
+    if let Node::Def(def) = ast {
+        println!("{}", def);
+    }
 
 }
 
@@ -91,11 +93,11 @@ impl<'code> Token<'code> {
 mod parser {
     use super::*;
 
-    pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> DefNode<'code> {
+    pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         parse_def(tokens)
     }
 
-    pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> DefNode<'code> {
+    pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         consume(tokens, "def").expect("def");
 
         let name = consume(tokens, "identifier").expect("function name");
@@ -104,11 +106,11 @@ mod parser {
 
         parse_end(tokens);
 
-        DefNode {
+        Node::Def(DefNode {
             name: name.value,
             arg_names,
             body,
-        }
+        })
     }
 
     fn parse_def_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<&'code str> {
@@ -137,16 +139,23 @@ mod parser {
         consume(tokens, "end").expect("end");
     }
 
-    fn parse_expr(tokens: &mut Vec<Token>) -> Vec<IntNode> {
-        parse_int(tokens)
+    fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+        if next_is("integer", tokens) {
+            parse_int(tokens)
+        } else {
+            parse_call(tokens)
+        }
     }
 
-    fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<IntNode> {
+    fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
         consume(tokens, "integer").expect("body");
-        vec![IntNode { value: 1 }]
+        vec![Node::Int(IntNode { value: 1 })]
     }
-    
 
+    fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+        let arg_expr = vec![];
+        vec![Node::Call(CallNode { name: String::from("test"), arg_expr })]
+    }
 
     fn next_is(kind_name: &str, tokens: &Vec<Token>) -> bool {
         &tokens[0].kind.name == kind_name
@@ -163,11 +172,18 @@ mod parser {
     }
 }
 
+/// Node
+pub enum Node<'code> {
+    Def(DefNode<'code>),
+    Int(IntNode),
+    Call(CallNode<'code>),
+}
+
 /// DefNode
 pub struct DefNode<'code> {
     name: &'code str,
     arg_names: Vec<&'code str>,
-    body: Vec<IntNode>,
+    body: Vec<Node<'code>>,
 }
 
 impl<'code> fmt::Display for DefNode<'code> {
@@ -180,7 +196,6 @@ impl<'code> fmt::Display for DefNode<'code> {
         )
     }
 }
-
 /// IntNode
 pub struct IntNode {
     value: i32,
