@@ -1,0 +1,8 @@
+[package]
+name = "web"
+version = "0.1.0"
+authors = ["ncphillips <ncphillips.19@gmail.com>"]
+
+[dependencies]
+regex = "1"
+
