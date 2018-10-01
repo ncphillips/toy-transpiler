@@ -11,7 +11,6 @@ works the same way.
 
 ## Todo
 
-- Split code into modules
-- Make `token_kinds` STATIC
+- Make `token_kinds` STATIC?
 - Better way to do sub-types of Token?
 
