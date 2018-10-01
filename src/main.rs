@@ -22,9 +22,10 @@ fn main() {
 
     let ast = parser::parse(&mut tokens);
 
-    if let Node::Def(def) = ast {
-        println!("{}", def);
-    }
+    println!("\n\n");
+    println!("NP: {}\n\n", code);
+    println!("JS: {}", generator::generate(&ast));
+    println!("\n\n");
 
 }
 
@@ -284,4 +285,36 @@ impl<'code> fmt::Display for VarRefNode<'code> {
             self.name,
         )
     }
+}
+
+
+
+
+
+
+
+
+/// Generator
+
+mod generator {
+    use super::*;
+
+    pub fn generate(node: &Node) -> String {
+        match node {
+            Node::Def(n) => {
+                let mut bodies = String::from("");
+                for b in &n.body {
+                    bodies = generate(&b);
+                };
+                format!(
+                    "function {}({}) {{ return {} }}",
+                    n.name,
+                    n.arg_names.join(", "),
+                    bodies
+                )
+            }
+            _ =>  String::from(""),
+        }
+    }
+
 }
