@@ -1,11 +1,11 @@
-use super::node;
+use super::node::{Node, IntNode, VarRefNode, CallNode, DefNode};
 use super::token::Token;
 
-pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
+pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     parse_def(tokens)
 }
 
-pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
+pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     consume(tokens, "def").expect("def");
 
     let name = consume(tokens, "identifier").expect("function name");
@@ -14,7 +14,7 @@ pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
 
     parse_end(tokens);
 
-    node::Node::Def(node::DefNode {
+    Node::Def(DefNode {
         name: name.value,
         arg_names,
         body,
@@ -47,7 +47,7 @@ fn parse_end<'code>(tokens: &mut Vec<Token<'code>>) {
     consume(tokens, "end").expect("end");
 }
 
-fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
+fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     if next_is("integer", tokens) {
         parse_int(tokens)
     } else if next_is("identifier", tokens) && index_is(1, "oparam", tokens) {
@@ -57,26 +57,26 @@ fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
     }
 }
 
-fn parse_var_ref<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
+fn parse_var_ref<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     let token = consume(tokens, "identifier").expect("variable");
     let name = token.value;
-    node::Node::VarRef(node::VarRefNode { name })
+    Node::VarRef(VarRefNode { name })
 }
 
-fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
+fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     let token = consume(tokens, "integer").expect("body");
     let value: i32 = token.value.parse().unwrap();
-    node::Node::Int(node::IntNode { value })
+    Node::Int(IntNode { value })
 }
 
-fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
+fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     let name = consume(tokens, "identifier").expect("identifier");
     let name = String::from(name.value);
     let arg_expr = parse_call_args(tokens);
-    node::Node::Call(node::CallNode { name, arg_expr })
+    Node::Call(CallNode { name, arg_expr })
 }
 
-fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<node::Node<'code>> {
+fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
     let mut call_args = Vec::new();
 
     consume(tokens, "oparam")

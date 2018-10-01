@@ -1,4 +1,5 @@
 use std::fmt;
+
 #[derive(Debug)]
 pub enum Node<'code> {
     Def(DefNode<'code>),
