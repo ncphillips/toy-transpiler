@@ -1,7 +1,8 @@
 extern crate regex;
 
-use std::fmt;
 use regex::Regex;
+
+mod node;
 
 fn main() {
      let token_kinds= vec![
@@ -94,11 +95,11 @@ impl<'code> Token<'code> {
 mod parser {
     use super::*;
 
-    pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+    pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
         parse_def(tokens)
     }
 
-    pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+    pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
         consume(tokens, "def").expect("def");
 
         let name = consume(tokens, "identifier").expect("function name");
@@ -107,7 +108,7 @@ mod parser {
 
         parse_end(tokens);
 
-        Node::Def(DefNode {
+        node::Node::Def(node::DefNode {
             name: name.value,
             arg_names,
             body,
@@ -140,7 +141,7 @@ mod parser {
         consume(tokens, "end").expect("end");
     }
 
-    fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+    fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
         if next_is("integer", tokens) {
             parse_int(tokens)
         } else if next_is("identifier", tokens) && index_is(1, "oparam", tokens) {
@@ -150,26 +151,26 @@ mod parser {
         }
     }
 
-    fn parse_var_ref<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+    fn parse_var_ref<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
         let token = consume(tokens, "identifier").expect("variable");
         let name = token.value;
-        Node::VarRef(VarRefNode { name })
+        node::Node::VarRef(node::VarRefNode { name })
     }
 
-    fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+    fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
         let token = consume(tokens, "integer").expect("body");
         let value: i32 = token.value.parse().unwrap();
-        Node::Int(IntNode { value })
+        node::Node::Int(node::IntNode { value })
     }
 
-    fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+    fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> node::Node<'code> {
         let name = consume(tokens, "identifier").expect("identifier");
         let name = String::from(name.value);
         let arg_expr = parse_call_args(tokens);
-        Node::Call(CallNode { name, arg_expr })
+        node::Node::Call(node::CallNode { name, arg_expr })
     }
 
-    fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+    fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<node::Node<'code>> {
         let mut call_args = Vec::new();
 
         consume(tokens, "oparam")
@@ -210,88 +211,6 @@ mod parser {
     }
 }
 
-/// Node
-#[derive(Debug)]
-pub enum Node<'code> {
-    Def(DefNode<'code>),
-    Int(IntNode),
-    Call(CallNode<'code>),
-    VarRef(VarRefNode<'code>),
-}
-
-/// DefNode
-#[derive(Debug)]
-pub struct DefNode<'code> {
-    name: &'code str,
-    arg_names: Vec<&'code str>,
-    body: Vec<Node<'code>>,
-}
-
-impl<'code> fmt::Display for DefNode<'code> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<DefNode name='{}' arg_names={:?} body={:?}>",
-            self.name,
-            self.arg_names,
-            self.body,
-        )
-    }
-}
-/// IntNode
-#[derive(Debug)]
-pub struct IntNode {
-    value: i32,
-}
-
-impl fmt::Display for IntNode {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<IntNode value={} >",
-            self.value,
-        )
-    }
-}
-
-/// CallNode
-#[derive(Debug)]
-pub struct CallNode<'code> {
-    name: String,
-    arg_expr: Vec<Node<'code>>,
-}
-
-impl<'code> fmt::Display for CallNode<'code> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<CallNode name='{}' >",
-            self.name,
-        )
-    }
-}
-
-/// VarRefNode
-#[derive(Debug)]
-pub struct VarRefNode<'code> {
-    name: &'code str,
-}
-
-impl<'code> fmt::Display for VarRefNode<'code> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<VarRefNode name='{}' >",
-            self.name,
-        )
-    }
-}
-
-
-
-
-
-
 
 
 /// Generator
@@ -299,16 +218,16 @@ impl<'code> fmt::Display for VarRefNode<'code> {
 mod generator {
     use super::*;
 
-    pub fn generate(node: &Node) -> String {
+    pub fn generate(node: &node::Node) -> String {
         match node {
-            Node::Def(def_node) => generate_def(def_node),
-            Node::Call(call_node) => generate_call(call_node),
-            Node::Int(int_node) => generate_int(int_node),
-            Node::VarRef(var_ref_node) => generate_var_ref(var_ref_node),
+            node::Node::Def(def_node) => generate_def(def_node),
+            node::Node::Call(call_node) => generate_call(call_node),
+            node::Node::Int(int_node) => generate_int(int_node),
+            node::Node::VarRef(var_ref_node) => generate_var_ref(var_ref_node),
         }
     }
 
-    fn generate_def(def_node: &DefNode) -> String {
+    fn generate_def(def_node: &node::DefNode) -> String {
         let mut body_expr = Vec::new();
         for b in &def_node.body {
             body_expr.push(generate(&b));
@@ -321,7 +240,7 @@ mod generator {
         )
     }
 
-    fn generate_call(call_node: &CallNode) -> String {
+    fn generate_call(call_node: &node::CallNode) -> String {
         let mut arg_expr = Vec::new();
         for expr in &call_node.arg_expr {
             arg_expr.push(generate(&expr));
@@ -333,11 +252,11 @@ mod generator {
         )
     }
 
-    fn generate_int(int_node: &IntNode) -> String {
+    fn generate_int(int_node: &node::IntNode) -> String {
         format!("{}", int_node.value)
     }
 
-    fn generate_var_ref(var_ref_node: &VarRefNode) -> String {
+    fn generate_var_ref(var_ref_node: &node::VarRefNode) -> String {
         format!("{}", var_ref_node.name)
     }
 
