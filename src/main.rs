@@ -17,7 +17,7 @@ fn main() {
     let mut tokens: Vec<Token> = Vec::new();
 
 
-    let code = "def f(x, y, z) g(1, 2) end";
+    let code = "def f(x, y, z) g(name, 2) end";
     tokenizer::tokenize(code, &mut tokens, &token_kinds);
 
     let ast = parser::parse(&mut tokens);
@@ -63,7 +63,7 @@ mod tokenizer {
 }
 
 /// TokenKind
-pub struct TokenKind {
+pub struct TokenKind{
     name: String,
     re: Regex,
 }
@@ -142,9 +142,17 @@ mod parser {
     fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         if next_is("integer", tokens) {
             parse_int(tokens)
-        } else {
+        } else if next_is("identifier", tokens) && index_is(1, "oparam", tokens) {
             parse_call(tokens)
+        } else {
+            parse_var_ref(tokens)
         }
+    }
+
+    fn parse_var_ref<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+        let token = consume(tokens, "identifier").expect("variable");
+        let name = token.value;
+        Node::VarRef(VarRefNode { name })
     }
 
     fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
@@ -183,7 +191,11 @@ mod parser {
     }
 
     fn next_is(kind_name: &str, tokens: &Vec<Token>) -> bool {
-        &tokens[0].kind.name == kind_name
+        index_is(0, kind_name, tokens)
+    }
+
+    fn index_is(index: usize, kind_name: &str, tokens: &Vec<Token>) -> bool {
+        &tokens[index].kind.name == kind_name
     }
 
     pub fn consume<'code>(tokens: &mut Vec<Token<'code>>, kind: &str) -> Result<Token<'code>, String>  {
@@ -203,6 +215,7 @@ pub enum Node<'code> {
     Def(DefNode<'code>),
     Int(IntNode),
     Call(CallNode<'code>),
+    VarRef(VarRefNode<'code>),
 }
 
 /// DefNode
@@ -257,4 +270,18 @@ impl<'code> fmt::Display for CallNode<'code> {
     }
 }
 
+/// VarRefNode
+#[derive(Debug)]
+pub struct VarRefNode<'code> {
+    name: &'code str,
+}
 
+impl<'code> fmt::Display for VarRefNode<'code> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f, 
+            "<VarRefNode name='{}' >",
+            self.name,
+        )
+    }
+}
