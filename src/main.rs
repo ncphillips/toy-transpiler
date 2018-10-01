@@ -17,7 +17,7 @@ fn main() {
     let mut tokens: Vec<Token> = Vec::new();
 
 
-    let code = "def f(x, y, z) g() end";
+    let code = "def f(x, y, z) g(1, 2) end";
     tokenizer::tokenize(code, &mut tokens, &token_kinds);
 
     let ast = parser::parse(&mut tokens);
@@ -102,7 +102,7 @@ mod parser {
 
         let name = consume(tokens, "identifier").expect("function name");
         let arg_names = parse_def_args(tokens);
-        let body = parse_expr(tokens);
+        let body = vec![parse_expr(tokens)];
 
         parse_end(tokens);
 
@@ -139,7 +139,7 @@ mod parser {
         consume(tokens, "end").expect("end");
     }
 
-    fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+    fn parse_expr<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         if next_is("integer", tokens) {
             parse_int(tokens)
         } else {
@@ -147,25 +147,38 @@ mod parser {
         }
     }
 
-    fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+    fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         consume(tokens, "integer").expect("body");
-        vec![Node::Int(IntNode { value: 1 })]
+        Node::Int(IntNode { value: 1 })
     }
 
-    fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
-
+    fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         let name = consume(tokens, "identifier").expect("identifier");
         let name = String::from(name.value);
+        let arg_expr = parse_call_args(tokens);
+        Node::Call(CallNode { name, arg_expr })
+    }
+
+    fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+        let mut call_args = Vec::new();
 
         consume(tokens, "oparam")
             .expect("Expected an \"oparam\" but received");
 
-        let arg_expr = vec![];
+        while !next_is("cparam", tokens) {
+            let node = parse_expr(tokens);
+            call_args.push(node);
 
+            if !next_is("cparam", tokens) {
+                consume(tokens, "comma")
+                    .expect("Expected a \"comma\" but received");
+            }
+        };
+        
         consume(tokens, "cparam")
             .expect("Expected an \"cparam\" but received");
 
-        vec![Node::Call(CallNode { name, arg_expr })]
+        call_args
     }
 
     fn next_is(kind_name: &str, tokens: &Vec<Token>) -> bool {
@@ -230,7 +243,7 @@ impl fmt::Display for IntNode {
 #[derive(Debug)]
 pub struct CallNode<'code> {
     name: String,
-    arg_expr: Vec<&'code str>,
+    arg_expr: Vec<Node<'code>>,
 }
 
 impl<'code> fmt::Display for CallNode<'code> {
