@@ -17,7 +17,7 @@ fn main() {
     let mut tokens: Vec<Token> = Vec::new();
 
 
-    let code = "def f(x, y, z) 1 end";
+    let code = "def f(x, y, z) g() end";
     tokenizer::tokenize(code, &mut tokens, &token_kinds);
 
     let ast = parser::parse(&mut tokens);
@@ -153,8 +153,19 @@ mod parser {
     }
 
     fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
+
+        let name = consume(tokens, "identifier").expect("identifier");
+        let name = String::from(name.value);
+
+        consume(tokens, "oparam")
+            .expect("Expected an \"oparam\" but received");
+
         let arg_expr = vec![];
-        vec![Node::Call(CallNode { name: String::from("test"), arg_expr })]
+
+        consume(tokens, "cparam")
+            .expect("Expected an \"cparam\" but received");
+
+        vec![Node::Call(CallNode { name, arg_expr })]
     }
 
     fn next_is(kind_name: &str, tokens: &Vec<Token>) -> bool {
@@ -173,6 +184,7 @@ mod parser {
 }
 
 /// Node
+#[derive(Debug)]
 pub enum Node<'code> {
     Def(DefNode<'code>),
     Int(IntNode),
@@ -180,6 +192,7 @@ pub enum Node<'code> {
 }
 
 /// DefNode
+#[derive(Debug)]
 pub struct DefNode<'code> {
     name: &'code str,
     arg_names: Vec<&'code str>,
@@ -190,13 +203,15 @@ impl<'code> fmt::Display for DefNode<'code> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f, 
-            "<DefNode name='{}' arg_names={:?} >",
+            "<DefNode name='{}' arg_names={:?} body={:?}>",
             self.name,
             self.arg_names,
+            self.body,
         )
     }
 }
 /// IntNode
+#[derive(Debug)]
 pub struct IntNode {
     value: i32,
 }
@@ -212,6 +227,7 @@ impl fmt::Display for IntNode {
 }
 
 /// CallNode
+#[derive(Debug)]
 pub struct CallNode<'code> {
     name: String,
     arg_expr: Vec<&'code str>,
