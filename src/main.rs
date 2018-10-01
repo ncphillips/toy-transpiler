@@ -148,8 +148,9 @@ mod parser {
     }
 
     fn parse_int<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
-        consume(tokens, "integer").expect("body");
-        Node::Int(IntNode { value: 1 })
+        let token = consume(tokens, "integer").expect("body");
+        let value: i32 = token.value.parse().unwrap();
+        Node::Int(IntNode { value })
     }
 
     fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
