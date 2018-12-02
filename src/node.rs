@@ -19,15 +19,12 @@ pub struct DefNode<'code> {
 impl<'code> fmt::Display for DefNode<'code> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
-            f, 
+            f,
             "<DefNode name='{}' arg_names={:?} body={:?}>",
-            self.name,
-            self.arg_names,
-            self.body,
+            self.name, self.arg_names, self.body,
         )
     }
 }
-
 
 /// IntNode
 #[derive(Debug)]
@@ -37,11 +34,7 @@ pub struct IntNode {
 
 impl fmt::Display for IntNode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<IntNode value={} >",
-            self.value,
-        )
+        write!(f, "<IntNode value={} >", self.value,)
     }
 }
 
@@ -54,11 +47,7 @@ pub struct CallNode<'code> {
 
 impl<'code> fmt::Display for CallNode<'code> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<CallNode name='{}' >",
-            self.name,
-        )
+        write!(f, "<CallNode name='{}' >", self.name,)
     }
 }
 
@@ -70,11 +59,6 @@ pub struct VarRefNode<'code> {
 
 impl<'code> fmt::Display for VarRefNode<'code> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f, 
-            "<VarRefNode name='{}' >",
-            self.name,
-        )
+        write!(f, "<VarRefNode name='{}' >", self.name,)
     }
 }
-
