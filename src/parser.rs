@@ -1,4 +1,4 @@
-use super::node::{Node, IntNode, VarRefNode, CallNode, DefNode};
+use super::node::{CallNode, DefNode, IntNode, Node, VarRefNode};
 use super::token::Token;
 
 pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
@@ -24,21 +24,18 @@ pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
 fn parse_def_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<&'code str> {
     let mut def_args = Vec::new();
 
-    consume(tokens, "oparam")
-        .expect("Expected an \"oparam\" but received");
+    consume(tokens, "oparam").expect("Expected an \"oparam\" but received");
 
     while !next_is("cparam", tokens) {
         let token = consume(tokens, "identifier").expect("next arg");
         def_args.push(token.value);
 
         if !next_is("cparam", tokens) {
-            consume(tokens, "comma")
-                .expect("Expected a \"comma\" but received");
+            consume(tokens, "comma").expect("Expected a \"comma\" but received");
         }
-    };
-    
-    consume(tokens, "cparam")
-        .expect("Expected an \"cparam\" but received");
+    }
+
+    consume(tokens, "cparam").expect("Expected an \"cparam\" but received");
 
     def_args
 }
@@ -79,21 +76,18 @@ fn parse_call<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
 fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
     let mut call_args = Vec::new();
 
-    consume(tokens, "oparam")
-        .expect("Expected an \"oparam\" but received");
+    consume(tokens, "oparam").expect("Expected an \"oparam\" but received");
 
     while !next_is("cparam", tokens) {
         let node = parse_expr(tokens);
         call_args.push(node);
 
         if !next_is("cparam", tokens) {
-            consume(tokens, "comma")
-                .expect("Expected a \"comma\" but received");
+            consume(tokens, "comma").expect("Expected a \"comma\" but received");
         }
-    };
-    
-    consume(tokens, "cparam")
-        .expect("Expected an \"cparam\" but received");
+    }
+
+    consume(tokens, "cparam").expect("Expected an \"cparam\" but received");
 
     call_args
 }
@@ -106,9 +100,9 @@ fn index_is(index: usize, kind_name: &str, tokens: &Vec<Token>) -> bool {
     &tokens[index].kind.name == kind_name
 }
 
-pub fn consume<'code>(tokens: &mut Vec<Token<'code>>, kind: &str) -> Result<Token<'code>, String>  {
+pub fn consume<'code>(tokens: &mut Vec<Token<'code>>, kind: &str) -> Result<Token<'code>, String> {
     let next_token = tokens.remove(0);
-    
+
     if next_token.kind.name == kind {
         return Ok(next_token);
     }
