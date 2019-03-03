@@ -12,10 +12,12 @@ pub fn generate(node: &Node) -> String {
 
 fn generate_root(root_node: &RootNode) -> String {
     let mut body_expr = Vec::new();
+
     for b in &root_node.body {
         body_expr.push(generate(&b));
     }
-    format!("{}", body_expr.join("\n"))
+
+    body_expr.join("\n").to_string()
 }
 
 fn generate_def(def_node: &DefNode) -> String {

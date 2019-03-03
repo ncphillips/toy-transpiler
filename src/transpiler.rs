@@ -4,7 +4,7 @@ mod parser;
 mod token;
 mod tokenizer;
 
-pub fn transpile<'code>(code: &'code str) -> String {
+pub fn transpile(code: &str) -> String {
     let token_kinds = vec![
         token::TokenKind::new("def", r"^(\bdef\b)"),
         token::TokenKind::new("end", r"^(\bend\b)"),
@@ -21,7 +21,7 @@ pub fn transpile<'code>(code: &'code str) -> String {
 
     let ast = parser::parse(&mut tokens);
 
-    return generator::generate(&ast);
+    generator::generate(&ast)
 }
 
 #[cfg(test)]
