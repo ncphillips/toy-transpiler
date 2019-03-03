@@ -31,7 +31,17 @@ mod tests {
     #[test]
     fn it_transpiles() {
         let input_code = "def f(x, y, z) g(name, 2) end";
+
         let output_code = "function f(x, y, z) { return g(name, 2) }";
+
+        assert_eq!(output_code, transpile(input_code));
+    }
+
+    #[test]
+    fn it_handles_empty_code() {
+        let input_code = "";
+
+        let output_code = "";
 
         assert_eq!(output_code, transpile(input_code));
     }

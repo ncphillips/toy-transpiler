@@ -2,10 +2,28 @@ use std::fmt;
 
 #[derive(Debug)]
 pub enum Node<'code> {
+    Root(RootNode<'code>),
     Def(DefNode<'code>),
     Int(IntNode),
     Call(CallNode<'code>),
     VarRef(VarRefNode<'code>),
+}
+
+/// RootNode
+#[derive(Debug)]
+pub struct RootNode<'code> {
+    pub body: Vec<Node<'code>>,
+}
+
+
+impl<'code> fmt::Display for RootNode<'code> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "<RootNode body={:?}>",
+            self.body,
+        )
+    }
 }
 
 /// DefNode

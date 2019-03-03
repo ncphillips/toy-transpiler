@@ -1,8 +1,16 @@
-use super::node::{CallNode, DefNode, IntNode, Node, VarRefNode};
+use super::node::{RootNode, CallNode, DefNode, IntNode, Node, VarRefNode};
 use super::token::Token;
 
 pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
-    parse_def(tokens)
+    let mut body = Vec::new();
+
+    if !tokens.is_empty() {
+        body.push(parse_def(tokens))
+    }
+
+    Node::Root(RootNode {
+        body,
+    })
 }
 
 pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {

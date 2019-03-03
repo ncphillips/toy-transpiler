@@ -1,12 +1,24 @@
-use super::node::{CallNode, DefNode, IntNode, Node, VarRefNode};
+use super::node::{RootNode, CallNode, DefNode, IntNode, Node, VarRefNode};
 
 pub fn generate(node: &Node) -> String {
     match node {
+        Node::Root(root_node) => generate_root(root_node),
         Node::Def(def_node) => generate_def(def_node),
         Node::Call(call_node) => generate_call(call_node),
         Node::Int(int_node) => generate_int(int_node),
         Node::VarRef(var_ref_node) => generate_var_ref(var_ref_node),
     }
+}
+
+fn generate_root(root_node: &RootNode) -> String {
+    let mut body_expr = Vec::new();
+    for b in &root_node.body {
+        body_expr.push(generate(&b));
+    }
+    format!(
+        "{}",
+        body_expr.join("\n")
+    )
 }
 
 fn generate_def(def_node: &DefNode) -> String {
