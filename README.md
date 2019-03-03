@@ -31,7 +31,7 @@ cargo test
 A helpful command in vim:
 
 ```
-:nmap <leader>t :w \| !clear && cargo test<CR>
+:nmap <leader>t :w \| !clear && RUST_BACKTRACE=1 ncargo test<CR>
 ```
 
 Then type `,t` to run tests from inside vim.
