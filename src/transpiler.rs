@@ -45,4 +45,13 @@ mod tests {
 
         assert_eq!(output_code, transpile(input_code));
     }
+
+    #[test]
+    fn it_handles_function_that_returns_a_constant_number() {
+        let input_code = "def f() 1 end";
+
+        let output_code = "function f() { return 1 }";
+
+        assert_eq!(output_code, transpile(input_code));
+    }
 }
