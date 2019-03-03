@@ -19,15 +19,28 @@ fn generate_root(root_node: &RootNode) -> String {
 }
 
 fn generate_def(def_node: &DefNode) -> String {
+    let body: String;
     let mut body_expr = Vec::new();
     for b in &def_node.body {
         body_expr.push(generate(&b));
     }
+
+    if let Some(final_expression) = body_expr.pop() {
+        body_expr.push(format!("return {}", final_expression));
+    }
+
+
+    if body_expr.is_empty() {
+        body = String::from("{ }");
+    } else {
+        body = format!("{{ {} }}", body_expr.join(";"));
+    }
+
     format!(
-        "function {}({}) {{ return {} }}",
+        "function {}({}) {}",
         def_node.name,
         def_node.arg_names.join(", "),
-        body_expr.join(";")
+        body
     )
 }
 

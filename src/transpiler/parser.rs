@@ -16,7 +16,11 @@ pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
 
     let name = consume(tokens, "identifier").expect("function name");
     let arg_names = parse_def_args(tokens);
-    let body = vec![parse_expr(tokens)];
+    let mut body = Vec::new();
+
+    if !next_is("end", tokens) {    
+        body.push(parse_expr(tokens));
+    }
 
     parse_end(tokens);
 
