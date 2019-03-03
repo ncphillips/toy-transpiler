@@ -14,3 +14,37 @@ works the same way.
 - Make `token_kinds` STATIC?
 - Better way to do sub-types of Token?
 
+## Development
+
+### Run
+
+```bash
+cargo run
+```
+
+### Test 
+
+```bash
+cargo test
+```
+
+A helpful command in vim:
+
+```
+:nmap <leader>t :w \| !clear && cargo test<CR>
+```
+
+Then type `,t` to run tests from inside vim.
+
+### Format Code
+
+```bash
+cargo fmt
+```
+
+### Linter
+```bash
+cargo clippy
+```
+
+
