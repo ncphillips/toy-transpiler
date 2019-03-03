@@ -29,7 +29,6 @@ fn generate_def(def_node: &DefNode) -> String {
         body_expr.push(format!("return {}", final_expression));
     }
 
-
     if body_expr.is_empty() {
         body = String::from("{ }");
     } else {

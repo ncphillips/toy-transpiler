@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(output_code, transpile(input_code));
     }
 
-     #[test]
+    #[test]
     fn it_handles_empty_functions() {
         let input_code = "def a() end";
 

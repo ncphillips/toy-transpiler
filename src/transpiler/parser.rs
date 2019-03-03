@@ -18,7 +18,7 @@ fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     let arg_names = parse_def_args(tokens);
     let mut body = Vec::new();
 
-    if !next_is("end", tokens) {    
+    if !next_is("end", tokens) {
         body.push(parse_expr(tokens));
     }
 
