@@ -1,12 +1,13 @@
 extern crate regex;
 
+use std::io::{self, Read};
+
 mod transpiler;
 
 fn main() {
-    let code = "def f(x, y, z) g(name, 2) end";
 
-    println!("\n\n");
-    println!("NP: {}\n\n", code);
-    println!("JS: {}", transpiler::transpile(&code));
-    println!("\n\n");
+    let mut code = String::new();
+    io::stdin().read_to_string(&mut code).expect("No code provided");
+
+    println!("{}", transpiler::transpile(&code));
 }
