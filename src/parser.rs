@@ -92,12 +92,13 @@ fn parse_call_args<'code>(tokens: &mut Vec<Token<'code>>) -> Vec<Node<'code>> {
     call_args
 }
 
-fn next_is(kind_name: &str, tokens: &Vec<Token>) -> bool {
+fn next_is(kind_name: &str, tokens: &[Token]) -> bool {
     index_is(0, kind_name, tokens)
 }
 
-fn index_is(index: usize, kind_name: &str, tokens: &Vec<Token>) -> bool {
-    &tokens[index].kind.name == kind_name
+// TODO: Pass in enum, not string.
+fn index_is(index: usize, kind_name: &str, tokens: &[Token]) -> bool {
+    tokens[index].kind.name == kind_name
 }
 
 pub fn consume<'code>(tokens: &mut Vec<Token<'code>>, kind: &str) -> Result<Token<'code>, String> {

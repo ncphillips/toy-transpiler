@@ -3,9 +3,9 @@ use super::token::{Token, TokenKind};
 pub fn tokenize<'code>(
     code: &'code str,
     tokens: &mut Vec<Token<'code>>,
-    token_kinds: &'code Vec<TokenKind>,
+    token_kinds: &'code [TokenKind]
 ) {
-    if code.len() > 0 {
+    if !code.is_empty() {
         let (more_code, token_option) = get_next_token(code, token_kinds);
 
         if let Some(token) = token_option {
@@ -18,7 +18,7 @@ pub fn tokenize<'code>(
 
 fn get_next_token<'code>(
     code: &'code str,
-    token_kinds: &'code Vec<TokenKind>,
+    token_kinds: &'code [TokenKind],
 ) -> (&'code str, Option<Token<'code>>) {
     for kind in token_kinds.iter() {
         if kind.re.is_match(&code) {

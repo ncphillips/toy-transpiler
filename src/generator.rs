@@ -35,5 +35,5 @@ fn generate_int(int_node: &IntNode) -> String {
 }
 
 fn generate_var_ref(var_ref_node: &VarRefNode) -> String {
-    format!("{}", var_ref_node.name)
+    var_ref_node.name.to_string()
 }
