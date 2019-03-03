@@ -11,7 +11,7 @@ pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     Node::Root(RootNode { body })
 }
 
-pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
+fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
     consume(tokens, "def").expect("def");
 
     let name = consume(tokens, "identifier").expect("function name");
@@ -111,7 +111,7 @@ fn index_is(index: usize, kind_name: &str, tokens: &[Token]) -> bool {
     tokens[index].kind.name == kind_name
 }
 
-pub fn consume<'code>(tokens: &mut Vec<Token<'code>>, kind: &str) -> Result<Token<'code>, String> {
+fn consume<'code>(tokens: &mut Vec<Token<'code>>, kind: &str) -> Result<Token<'code>, String> {
     let next_token = tokens.remove(0);
 
     if next_token.kind.name == kind {
