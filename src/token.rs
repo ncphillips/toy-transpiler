@@ -1,15 +1,15 @@
 use regex::Regex;
 
 /// TokenKind
-pub struct TokenKind{
+pub struct TokenKind {
     pub name: String,
     pub re: Regex,
 }
 
 impl TokenKind {
     pub fn new(name: &str, re: &str) -> TokenKind {
-        TokenKind { 
-            name: String::from(name), 
+        TokenKind {
+            name: String::from(name),
             re: Regex::new(re).unwrap(),
         }
     }
@@ -26,4 +26,3 @@ impl<'code> Token<'code> {
         Token { kind, value }
     }
 }
-
