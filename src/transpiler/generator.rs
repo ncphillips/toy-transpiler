@@ -1,4 +1,4 @@
-use super::node::{RootNode, CallNode, DefNode, IntNode, Node, VarRefNode};
+use super::node::{CallNode, DefNode, IntNode, Node, RootNode, VarRefNode};
 
 pub fn generate(node: &Node) -> String {
     match node {
@@ -15,10 +15,7 @@ fn generate_root(root_node: &RootNode) -> String {
     for b in &root_node.body {
         body_expr.push(generate(&b));
     }
-    format!(
-        "{}",
-        body_expr.join("\n")
-    )
+    format!("{}", body_expr.join("\n"))
 }
 
 fn generate_def(def_node: &DefNode) -> String {

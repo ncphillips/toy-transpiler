@@ -15,14 +15,9 @@ pub struct RootNode<'code> {
     pub body: Vec<Node<'code>>,
 }
 
-
 impl<'code> fmt::Display for RootNode<'code> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "<RootNode body={:?}>",
-            self.body,
-        )
+        write!(f, "<RootNode body={:?}>", self.body,)
     }
 }
 

@@ -1,4 +1,4 @@
-use super::node::{RootNode, CallNode, DefNode, IntNode, Node, VarRefNode};
+use super::node::{CallNode, DefNode, IntNode, Node, RootNode, VarRefNode};
 use super::token::Token;
 
 pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
@@ -8,9 +8,7 @@ pub fn parse<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
         body.push(parse_def(tokens))
     }
 
-    Node::Root(RootNode {
-        body,
-    })
+    Node::Root(RootNode { body })
 }
 
 pub fn parse_def<'code>(tokens: &mut Vec<Token<'code>>) -> Node<'code> {
