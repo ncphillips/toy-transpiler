@@ -3,7 +3,7 @@ use super::token::{Token, TokenKind};
 pub fn tokenize<'code>(
     code: &'code str,
     tokens: &mut Vec<Token<'code>>,
-    token_kinds: &'code [TokenKind]
+    token_kinds: &'code [TokenKind],
 ) {
     if !code.is_empty() {
         let (more_code, token_option) = get_next_token(code, token_kinds);
